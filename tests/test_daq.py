@@ -44,3 +44,18 @@ def test_mockdaq_stop_before_start_does_not_raise():
     daq = MockDAQ()
     daq.configure(sample_rate=SAMPLE_RATE, record_length=CHUNK)
     daq.stop()  # stop without start should not raise
+
+
+def test_mockdaq_read_before_start_raises():
+    daq = MockDAQ()
+    daq.configure(sample_rate=SAMPLE_RATE, record_length=CHUNK)
+    with pytest.raises(RuntimeError):
+        daq.read()
+
+
+def test_mockdaq_configure_validates_inputs():
+    daq = MockDAQ()
+    with pytest.raises(ValueError):
+        daq.configure(sample_rate=0, record_length=256)
+    with pytest.raises(ValueError):
+        daq.configure(sample_rate=1024, record_length=0)

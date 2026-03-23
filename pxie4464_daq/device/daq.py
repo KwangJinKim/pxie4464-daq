@@ -46,6 +46,10 @@ class MockDAQ(_DAQBase):
         self._running = False
 
     def configure(self, sample_rate: float, record_length: int, voltage_range: float = 10.0) -> None:
+        if sample_rate <= 0:
+            raise ValueError(f"sample_rate must be positive, got {sample_rate}")
+        if record_length <= 0:
+            raise ValueError(f"record_length must be positive, got {record_length}")
         self._sample_rate = float(sample_rate)
         self._record_length = int(record_length)
 
@@ -56,6 +60,8 @@ class MockDAQ(_DAQBase):
         self._running = False
 
     def read(self) -> np.ndarray:
+        if not self._running:
+            raise RuntimeError("DAQ is not running. Call start() first.")
         t = np.arange(self._record_length) / self._sample_rate
         data = np.zeros((N_CHANNELS, self._record_length), dtype=np.float64)
         for ch, freq in enumerate(CHANNEL_FREQS):
